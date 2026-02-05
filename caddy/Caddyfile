@@ -1,0 +1,45 @@
+{
+    auto_https off
+}
+
+:80 {
+    # Security headers
+    header {
+        Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy no-referrer
+        X-XSS-Protection 0
+    }
+
+    # Frontend static files
+    root * /srv/frontend
+    file_server
+
+    # API routes
+    handle /api/* {
+        reverse_proxy backend:8080 {
+            header_up Host {host}
+            header_up X-Real-IP {remote}
+            header_up X-Forwarded-For {remote}
+            header_up X-Forwarded-Proto {scheme}
+        }
+    }
+
+    # Health check endpoint
+    handle /health {
+        reverse_proxy backend:8080
+    }
+
+    # Single page application - serve index.html for all other routes
+    handle {
+        try_files {path} /index.html
+        file_server
+    }
+
+    # Logging
+    log {
+        output file /var/log/caddy/access.log
+        format json
+    }
+}
