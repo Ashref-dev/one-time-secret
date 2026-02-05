@@ -4,7 +4,7 @@
 
 **Secure, self-hosted secret sharing with zero-knowledge encryption**
 
-[![CI/CD](https://github.com/yourusername/ots/actions/workflows/ci.yml/badge.svg)](https://github.com/yourusername/ots/actions)
+[![CI/CD](https://github.com/Ashref-dev/one-time-secret/actions/workflows/ci.yml/badge.svg)](https://github.com/Ashref-dev/one-time-secret/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Go Version](https://img.shields.io/badge/go-1.21-blue.svg)](https://golang.org)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com)
@@ -62,7 +62,7 @@ Built with a minimalist, muted purple aesthetic that works in both light and dar
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/yourusername/ots.git
+git clone https://github.com/Ashref-dev/one-time-secret.git
 cd ots
 
 # Copy and edit configuration
