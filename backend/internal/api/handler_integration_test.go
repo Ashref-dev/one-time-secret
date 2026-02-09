@@ -313,7 +313,7 @@ func resolveMigrationPath() (string, error) {
 	}
 
 	migrationsDir := filepath.Clean(filepath.Join(filepath.Dir(file), "..", "..", "migrations"))
-	return filepath.Join(migrationsDir, "001_init_schema.sql"), nil
+	return filepath.Join(migrationsDir, "000001_init_schema.up.sql"), nil
 }
 
 func resetSecretsTable(t *testing.T, database *db.DB) {

@@ -1,9 +1,6 @@
-version: '3.8'
-
 services:
   postgres:
-    image: postgres:16-alpine
-    container_name: ots-postgres
+    image: postgres:alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-ots_user}
@@ -24,7 +21,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: ots-backend
     restart: unless-stopped
     environment:
       DB_HOST: postgres
@@ -33,7 +29,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD:-secure_password_change_in_production}
       DB_NAME: ${DB_NAME:-ots_db}
       DATABASE_URL: postgres://${DB_USER:-ots_user}:${DB_PASSWORD:-secure_password_change_in_production}@postgres:5432/${DB_NAME:-ots_db}?sslmode=disable
-      PORT: 8080
+      PORT: 8091
       ENV: ${ENV:-production}
       MAX_SECRET_SIZE: ${MAX_SECRET_SIZE:-32768}
       DEFAULT_TTL: ${DEFAULT_TTL:-3600}
@@ -50,7 +46,6 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile.cleanup
-    container_name: ots-cleanup
     restart: unless-stopped
     environment:
       DB_HOST: postgres
@@ -70,34 +65,18 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: ots-frontend
     restart: unless-stopped
     environment:
       VITE_API_URL: ${VITE_API_URL:-/api}
-    networks:
-      - ots-network
-
-  caddy:
-    image: caddy:2-alpine
-    container_name: ots-caddy
-    restart: unless-stopped
     ports:
-      - "80:80"
-      - "443:443"
-    volumes:
-      - ./caddy/Caddyfile:/etc/caddy/Caddyfile
-      - caddy_data:/data
-      - caddy_config:/config
+      - "3069:80"
     depends_on:
       - backend
-      - frontend
     networks:
       - ots-network
 
 volumes:
   postgres_data:
-  caddy_data:
-  caddy_config:
 
 networks:
   ots-network:

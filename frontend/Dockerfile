@@ -1,4 +1,4 @@
-FROM node:20-alpine AS builder
+FROM node:alpine AS builder
 
 WORKDIR /app
 
@@ -22,7 +22,16 @@ RUN echo 'server { \
     } \
     \
     location /api/ { \
-        proxy_pass http://backend:8080/api/; \
+        proxy_pass http://backend:8091/api/; \
+        proxy_http_version 1.1; \
+        proxy_set_header Host $host; \
+        proxy_set_header X-Real-IP $remote_addr; \
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; \
+        proxy_set_header X-Forwarded-Proto $scheme; \
+    } \
+    \
+    location /health { \
+        proxy_pass http://backend:8091/health; \
         proxy_http_version 1.1; \
         proxy_set_header Host $host; \
         proxy_set_header X-Real-IP $remote_addr; \

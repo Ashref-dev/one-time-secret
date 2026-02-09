@@ -6,7 +6,7 @@
 
 [![CI/CD](https://github.com/Ashref-dev/one-time-secret/actions/workflows/ci.yml/badge.svg)](https://github.com/Ashref-dev/one-time-secret/actions)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Go Version](https://img.shields.io/badge/go-1.21-blue.svg)](https://golang.org)
+[![Go Version](https://img.shields.io/badge/go-1.24-blue.svg)](https://golang.org)
 [![Docker](https://img.shields.io/badge/docker-ready-blue.svg)](https://www.docker.com)
 
 [Demo](#demo) • [Features](#features) • [Quick Start](#quick-start) • [Security](#security) • [API](#api)
@@ -47,7 +47,7 @@ Built with a minimalist, muted purple aesthetic that works in both light and dar
 - **Backend:** Go (Chi router, pgx PostgreSQL driver)
 - **Frontend:** React + TypeScript + Vite
 - **Crypto:** WebCrypto API (AES-256-GCM)
-- **Database:** PostgreSQL 16
+- **Database:** PostgreSQL (latest)
 - **Proxy:** Caddy (automatic HTTPS ready)
 
 ---
@@ -81,10 +81,10 @@ docker-compose up -d
 docker-compose logs -f
 
 # Verify health
-curl http://localhost/health
+curl http://localhost:3069/health
 ```
 
-The application will be available at `http://localhost`
+The application will be available at `http://localhost:3069`
 
 ### 3. Configure HTTPS (Production)
 
@@ -301,7 +301,7 @@ npm run build
 Migrations run automatically on startup. To run manually:
 
 ```bash
-docker-compose exec postgres psql -U ots_user -d ots_db -f /docker-entrypoint-initdb.d/001_init_schema.sql
+docker-compose exec postgres psql -U ots_user -d ots_db -f /docker-entrypoint-initdb.d/000001_init_schema.up.sql
 ```
 
 ---

@@ -24,7 +24,7 @@
    - Playwright E2E tests
    - Responsive design with dark mode
 
-3. **Database (PostgreSQL 16)**
+3. **Database (PostgreSQL latest)**
    - Automatic schema migrations
    - Connection pooling
    - Health checks
@@ -76,7 +76,7 @@
 ### Services
 | Service | Image | Port | Purpose |
 |---------|-------|------|---------|
-| postgres | postgres:16-alpine | 5432 | Database |
+| postgres | postgres:alpine | 5432 | Database |
 | backend | Build from Dockerfile | 8080 | API Server |
 | cleanup | Build from Dockerfile.cleanup | - | Expired secret cleanup |
 | frontend | Build from Dockerfile | 80 | React app |
@@ -109,13 +109,13 @@ docker-compose ps
 docker-compose logs -f
 
 # Verify health
-curl http://localhost/api/health
+curl http://localhost:3069/health
 ```
 
 ### Access the Application
-- **Local:** http://localhost
-- **Health Check:** http://localhost/api/health
-- **Metrics:** http://localhost/api/metrics
+- **Local:** http://localhost:3069
+- **Health Check:** http://localhost:3069/health
+- **Metrics:** http://localhost:3069/api/metrics
 
 ---
 

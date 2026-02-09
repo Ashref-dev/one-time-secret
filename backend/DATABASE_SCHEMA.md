@@ -2,7 +2,7 @@
 
 ## Overview
 
-PostgreSQL 15 database for One-Time Secrets service.
+PostgreSQL (latest) database for One-Time Secrets service.
 
 All migrations run **automatically** on application startup via `database.Migrate("./migrations")` call in `cmd/server/main.go` line 28.
 
@@ -32,7 +32,7 @@ Stores encrypted secret messages and their metadata.
 ## Migration System
 
 ### Location
-- `migrations/001_init_schema.sql` — Initial database schema
+- `migrations/000001_init_schema.up.sql` — Initial database schema
 
 ### Execution Flow
 

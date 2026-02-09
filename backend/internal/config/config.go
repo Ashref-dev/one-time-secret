@@ -21,7 +21,7 @@ type Config struct {
 func Load() *Config {
 	dbURL := os.Getenv("DATABASE_URL")
 	if dbURL == "" {
-		dbURL = "postgres://ots_user:secure_password@localhost:5432/ots_db?sslmode=disable"
+		dbURL = "postgres://ots_user:ots_password@localhost:5432/ots?sslmode=disable"
 	}
 
 	maxSize, _ := strconv.Atoi(os.Getenv("MAX_SECRET_SIZE"))

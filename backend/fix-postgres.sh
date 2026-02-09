@@ -19,7 +19,7 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15-alpine
+    image: postgres:alpine
     container_name: ots-postgres
     environment:
       POSTGRES_USER: postgres

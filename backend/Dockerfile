@@ -1,6 +1,8 @@
-FROM golang:1.21-alpine AS builder
+FROM golang:latest AS builder
 
-RUN apk add --no-cache git ca-certificates
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git ca-certificates \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
@@ -18,7 +20,8 @@ RUN apk --no-cache add ca-certificates
 WORKDIR /root/
 
 COPY --from=builder /ots-server .
+COPY --from=builder /app/migrations ./migrations
 
-EXPOSE 8080
+EXPOSE 8091
 
 CMD ["./ots-server"]
