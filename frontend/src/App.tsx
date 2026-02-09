@@ -11,47 +11,48 @@ function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
-    // Check for saved theme preference or system preference
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
-    if (savedTheme) {
-      setTheme(savedTheme);
-    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      setTheme('dark');
-    }
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    const updateTheme = () => setTheme(media.matches ? 'dark' : 'light');
+    updateTheme();
+    media.addEventListener('change', updateTheme);
+    return () => media.removeEventListener('change', updateTheme);
   }, []);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
   }, [theme]);
-
-  const toggleTheme = () => {
-    setTheme(prev => prev === 'light' ? 'dark' : 'light');
-  };
 
   return (
     <div className="app">
+      <a href="#main" className="skip-link">Skip to content</a>
       <header className="header">
         <div className="container">
           <div className="header-content">
             <div className="logo">
-              <span className="logo-icon">🔐</span>
-              <span className="logo-text">OTS</span>
+              <span className="logo-dot" aria-hidden="true" />
+              <span className="logo-text">ots.ashref.tn</span>
             </div>
             <nav className="nav">
-              <button 
-                className="theme-toggle"
-                onClick={toggleTheme}
-                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-              >
-                {theme === 'light' ? '🌙' : '☀️'}
-              </button>
+              <details className="about-menu">
+                <summary>About</summary>
+                <div className="about-panel">
+                  <p>
+                    One-time secret sharing with client-side encryption. Secrets are deleted after viewing.
+                  </p>
+                  <p className="about-muted">
+                    Keep the link and passphrase separate for maximum safety.
+                  </p>
+                  <p className="about-muted">
+                    made by ashref.tn
+                  </p>
+                </div>
+              </details>
             </nav>
           </div>
         </div>
       </header>
 
-      <main className="main">
+      <main id="main" className="main">
         <div className="container">
           <Routes>
             <Route path="/" element={<CreateSecret />} />
@@ -60,14 +61,6 @@ function App() {
           </Routes>
         </div>
       </main>
-
-      <footer className="footer">
-        <div className="container">
-          <p className="footer-text">
-            Secure one-time secret sharing. Secrets are encrypted in your browser and can only be viewed once.
-          </p>
-        </div>
-      </footer>
     </div>
   );
 }

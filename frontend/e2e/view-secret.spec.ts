@@ -8,7 +8,7 @@ test.describe('View Secret Page', () => {
   test('should show not found for invalid secret ID', async ({ page }) => {
     await page.goto('/s/invalid-secret-id-12345');
     
-    await expect(page.getByText('Secret Unavailable')).toBeVisible();
+    await expect(page.getByText('Secret unavailable')).toBeVisible();
     await expect(page.getByText('This secret does not exist or has already been viewed')).toBeVisible();
   });
 
@@ -22,15 +22,15 @@ test.describe('View Secret Page', () => {
     const secretMessage = 'My super secret message';
     
     await page.getByPlaceholder('Paste your secret here...').fill(secretMessage);
-    await page.getByText('🔐 Create Secret Link').click();
-    await page.getByText('✅ Secret Ready to Share').waitFor({ timeout: 10000 });
+    await page.getByText('Create secret link').click();
+    await page.getByText('Secret ready to share').waitFor({ timeout: 10000 });
     
     const linkElement = await page.locator('.url-display');
     const shareUrl = await linkElement.textContent();
     
     await page.goto(shareUrl!);
     
-    await expect(page.getByText('🔓 Decrypted Secret')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Decrypted secret')).toBeVisible({ timeout: 10000 });
     await expect(page.getByText(secretMessage)).toBeVisible();
     await expect(page.getByText('This secret has been permanently deleted from the server')).toBeVisible();
   });
@@ -41,14 +41,14 @@ test.describe('View Secret Page', () => {
     const secretMessage = 'Copy this secret';
     
     await page.getByPlaceholder('Paste your secret here...').fill(secretMessage);
-    await page.getByText('🔐 Create Secret Link').click();
-    await page.getByText('✅ Secret Ready to Share').waitFor({ timeout: 10000 });
+    await page.getByText('Create secret link').click();
+    await page.getByText('Secret ready to share').waitFor({ timeout: 10000 });
     
     const shareUrl = await page.locator('.url-display').textContent();
     await page.goto(shareUrl!);
     
-    await page.getByText('🔓 Decrypted Secret').waitFor({ timeout: 10000 });
-    await page.getByText('📋 Copy Secret').click();
+    await page.getByText('Decrypted secret').waitFor({ timeout: 10000 });
+    await page.getByText('Copy secret').click();
     
     const clipboardText = await page.evaluate(() => navigator.clipboard.readText());
     expect(clipboardText).toBe(secretMessage);
@@ -61,13 +61,13 @@ test.describe('View Secret Page', () => {
     await page.getByPlaceholder('Paste your secret here...').fill(secretMessage);
     await page.getByLabel('Require passphrase').check();
     await page.getByPlaceholder('Enter a strong passphrase').fill(passphrase);
-    await page.getByText('🔐 Create Secret Link').click();
-    await page.getByText('✅ Secret Ready to Share').waitFor({ timeout: 10000 });
+    await page.getByText('Create secret link').click();
+    await page.getByText('Secret ready to share').waitFor({ timeout: 10000 });
     
     const shareUrl = await page.locator('.url-display').textContent();
     await page.goto(shareUrl!);
     
-    await expect(page.getByText('🔐 Passphrase Required')).toBeVisible({ timeout: 10000 });
+    await expect(page.getByText('Passphrase required')).toBeVisible({ timeout: 10000 });
     await expect(page.getByPlaceholder('Enter the passphrase')).toBeVisible();
   });
 
@@ -78,17 +78,17 @@ test.describe('View Secret Page', () => {
     await page.getByPlaceholder('Paste your secret here...').fill(secretMessage);
     await page.getByLabel('Require passphrase').check();
     await page.getByPlaceholder('Enter a strong passphrase').fill(passphrase);
-    await page.getByText('🔐 Create Secret Link').click();
-    await page.getByText('✅ Secret Ready to Share').waitFor({ timeout: 10000 });
+    await page.getByText('Create secret link').click();
+    await page.getByText('Secret ready to share').waitFor({ timeout: 10000 });
     
     const shareUrl = await page.locator('.url-display').textContent();
     await page.goto(shareUrl!);
     
-    await page.getByText('🔐 Passphrase Required').waitFor({ timeout: 10000 });
+    await page.getByText('Passphrase required').waitFor({ timeout: 10000 });
     await page.getByPlaceholder('Enter the passphrase').fill(passphrase);
     await page.getByText('Decrypt Secret').click();
     
-    await expect(page.getByText('🔓 Decrypted Secret')).toBeVisible();
+    await expect(page.getByText('Decrypted secret')).toBeVisible();
     await expect(page.getByText(secretMessage)).toBeVisible();
   });
 
@@ -99,13 +99,13 @@ test.describe('View Secret Page', () => {
     await page.getByPlaceholder('Paste your secret here...').fill(secretMessage);
     await page.getByLabel('Require passphrase').check();
     await page.getByPlaceholder('Enter a strong passphrase').fill(correctPassphrase);
-    await page.getByText('🔐 Create Secret Link').click();
-    await page.getByText('✅ Secret Ready to Share').waitFor({ timeout: 10000 });
+    await page.getByText('Create secret link').click();
+    await page.getByText('Secret ready to share').waitFor({ timeout: 10000 });
     
     const shareUrl = await page.locator('.url-display').textContent();
     await page.goto(shareUrl!);
     
-    await page.getByText('🔐 Passphrase Required').waitFor({ timeout: 10000 });
+    await page.getByText('Passphrase required').waitFor({ timeout: 10000 });
     await page.getByPlaceholder('Enter the passphrase').fill('wrong-passphrase');
     await page.getByText('Decrypt Secret').click();
     
@@ -114,18 +114,18 @@ test.describe('View Secret Page', () => {
 
   test('should provide link to create new secret after viewing', async ({ page }) => {
     await page.getByPlaceholder('Paste your secret here...').fill('Test secret');
-    await page.getByText('🔐 Create Secret Link').click();
-    await page.getByText('✅ Secret Ready to Share').waitFor({ timeout: 10000 });
+    await page.getByText('Create secret link').click();
+    await page.getByText('Secret ready to share').waitFor({ timeout: 10000 });
     
     const shareUrl = await page.locator('.url-display').textContent();
     await page.goto(shareUrl!);
     
-    await page.getByText('🔓 Decrypted Secret').waitFor({ timeout: 10000 });
+    await page.getByText('Decrypted secret').waitFor({ timeout: 10000 });
     
-    await expect(page.getByText('Create New Secret')).toBeVisible();
+    await expect(page.getByText('Create new secret')).toBeVisible();
     
-    await page.getByText('Create New Secret').click();
+    await page.getByText('Create new secret').click();
     
-    await expect(page.getByText('Share a Secret')).toBeVisible();
+    await expect(page.getByText('Share a secret')).toBeVisible();
   });
 });

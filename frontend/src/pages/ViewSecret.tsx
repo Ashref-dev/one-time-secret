@@ -11,6 +11,7 @@ export default function ViewSecret() {
   const [error, setError] = useState<string | null>(null);
   const [needsPassphrase, setNeedsPassphrase] = useState(false);
   const [passphrase, setPassphrase] = useState('');
+  const [copyStatus, setCopyStatus] = useState<'idle' | 'copied' | 'error'>('idle');
   const [encryptedData, setEncryptedData] = useState<{
     ciphertext: string;
     iv: string;
@@ -81,6 +82,7 @@ export default function ViewSecret() {
       );
       setSecret(decrypted);
       setNeedsPassphrase(false);
+      setCopyStatus('idle');
     } catch {
       setError('Incorrect passphrase. Please try again.');
     }
@@ -90,9 +92,9 @@ export default function ViewSecret() {
     if (secret) {
       try {
         await navigator.clipboard.writeText(secret);
-        alert('Secret copied to clipboard!');
+        setCopyStatus('copied');
       } catch {
-        alert('Failed to copy. Please select and copy manually.');
+        setCopyStatus('error');
       }
     }
   };
@@ -112,11 +114,11 @@ export default function ViewSecret() {
     return (
       <div className="card">
         <div className="not-found">
-          <h1>🔒</h1>
-          <h2>Secret Unavailable</h2>
-          <p>{error}</p>
+          <h1>Secret unavailable</h1>
+          <h2>Link not found</h2>
+          <p role="alert" aria-live="assertive">{error}</p>
           <a href="/" className="btn btn-primary" style={{ marginTop: '1rem' }}>
-            Create New Secret
+            Create new secret
           </a>
         </div>
       </div>
@@ -126,14 +128,15 @@ export default function ViewSecret() {
   if (needsPassphrase && encryptedData) {
     return (
       <div className="card">
-        <h1 className="card-title">🔐 Passphrase Required</h1>
+        <h1 className="card-title">Passphrase required</h1>
         <p className="card-subtitle">
           This secret is protected with a passphrase. Enter it to decrypt the content.
         </p>
 
         {error && (
-          <div className="alert alert-error">
-            <span>⚠️</span> {error}
+          <div className="alert alert-error" role="alert" aria-live="assertive">
+            <span className="alert-label">Error</span>
+            <span>{error}</span>
           </div>
         )}
 
@@ -163,11 +166,10 @@ export default function ViewSecret() {
     return (
       <div className="card">
         <div className="warning-banner">
-          <span>⚠️</span>
           <span>This secret has been permanently deleted from the server</span>
         </div>
 
-        <h1 className="card-title">🔓 Decrypted Secret</h1>
+        <h1 className="card-title">Decrypted secret</h1>
         <p className="card-subtitle">
           This message will not be shown again. Copy it now if needed.
         </p>
@@ -179,8 +181,13 @@ export default function ViewSecret() {
           onClick={copyToClipboard}
           style={{ marginTop: '1rem' }}
         >
-          📋 Copy Secret
+          Copy secret
         </button>
+        {copyStatus !== 'idle' && (
+          <p className={`inline-status ${copyStatus}`} role="status" aria-live="polite">
+            {copyStatus === 'copied' ? 'Secret copied' : 'Copy failed'}
+          </p>
+        )}
 
         <div className="info-section" style={{ marginTop: '1.5rem' }}>
           <p>
@@ -194,7 +201,7 @@ export default function ViewSecret() {
           className="btn btn-secondary btn-full"
           style={{ marginTop: '1rem' }}
         >
-          Create New Secret
+          Create new secret
         </a>
       </div>
     );
