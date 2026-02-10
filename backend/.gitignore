@@ -35,3 +35,11 @@ vendor/
 # Build artifacts
 server
 cleanup
+
+# Allow source directories named server/cleanup
+!cmd/server/
+!cmd/server/**
+!cmd/cleanup/
+!cmd/cleanup/**
+!internal/cleanup/
+!internal/cleanup/**
