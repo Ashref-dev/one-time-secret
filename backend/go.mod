@@ -11,6 +11,8 @@ require (
 	github.com/testcontainers/testcontainers-go/modules/postgres v0.27.0
 )
 
+replace dario.cat/mergo => github.com/imdario/mergo v1.0.0
+
 require (
 	dario.cat/mergo v1.0.0 // indirect
 	github.com/Azure/go-ansiterm v0.0.0-20230124172434-306776ec8161 // indirect
