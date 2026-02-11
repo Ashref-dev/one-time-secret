@@ -11,6 +11,11 @@ function App() {
   const [theme, setTheme] = useState<'light' | 'dark'>('light');
 
   useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    if (savedTheme === 'light' || savedTheme === 'dark') {
+      setTheme(savedTheme);
+      return;
+    }
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const updateTheme = () => setTheme(media.matches ? 'dark' : 'light');
     updateTheme();
@@ -20,7 +25,12 @@ function App() {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
   }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme(prev => (prev === 'light' ? 'dark' : 'light'));
+  };
 
   return (
     <div className="app">
@@ -33,6 +43,17 @@ function App() {
               <span className="logo-text">ots.ashref.tn</span>
             </div>
             <nav className="nav">
+              <button
+                type="button"
+                className="theme-toggle"
+                onClick={toggleTheme}
+                aria-label="Toggle color theme"
+                aria-pressed={theme === 'dark'}
+              >
+                <span className="theme-label">Theme</span>
+                <span className="theme-state">{theme === 'light' ? 'Light' : 'Dark'}</span>
+                <span className={`theme-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true" />
+              </button>
               <details className="about-menu">
                 <summary>About</summary>
                 <div className="about-panel">

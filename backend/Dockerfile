@@ -1,4 +1,4 @@
-FROM golang:latest AS builder
+FROM golang:1.26.0 AS builder
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git ca-certificates \
