@@ -1,5 +1,8 @@
 FROM golang:1.26.0 AS builder
 
+ARG GOPROXY=direct
+ENV GOPROXY=${GOPROXY}
+
 RUN apt-get update \
     && apt-get install -y --no-install-recommends git ca-certificates \
     && rm -rf /var/lib/apt/lists/*
