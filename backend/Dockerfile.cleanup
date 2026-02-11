@@ -10,7 +10,7 @@ RUN apt-get update \
 WORKDIR /app
 
 COPY go.mod go.sum ./
-RUN go mod download
+RUN GOPROXY=direct go mod download
 
 COPY . .
 
