@@ -1,25 +1,46 @@
-import { useState, useEffect } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { Route, Routes } from 'react-router-dom';
 import './styles.css';
 
-// Pages
 import CreateSecret from './pages/CreateSecret';
-import ViewSecret from './pages/ViewSecret';
 import NotFound from './pages/NotFound';
+import ViewSecret from './pages/ViewSecret';
+
+type Theme = 'light' | 'dark';
+
+function SunIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M12 2.75V5.25M12 18.75V21.25M2.75 12H5.25M18.75 12H21.25M5.45 5.45L7.2 7.2M16.8 16.8L18.55 18.55M16.8 7.2L18.55 5.45M5.45 18.55L7.2 16.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function MoonIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M20.2 14.15A8.8 8.8 0 1 1 9.85 3.8 7 7 0 1 0 20.2 14.15Z" stroke="currentColor" strokeWidth="1.8" strokeLinejoin="round" />
+    </svg>
+  );
+}
 
 function App() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('light');
+  const [theme, setTheme] = useState<Theme>('dark');
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as 'light' | 'dark' | null;
+    const savedTheme = localStorage.getItem('theme') as Theme | null;
     if (savedTheme === 'light' || savedTheme === 'dark') {
       setTheme(savedTheme);
       return;
     }
+
     const media = window.matchMedia('(prefers-color-scheme: dark)');
     const updateTheme = () => setTheme(media.matches ? 'dark' : 'light');
+
     updateTheme();
     media.addEventListener('change', updateTheme);
+
     return () => media.removeEventListener('change', updateTheme);
   }, []);
 
@@ -34,15 +55,31 @@ function App() {
 
   return (
     <div className="app">
+      <div className="backdrop" aria-hidden="true">
+        <div className="backdrop-orb orb-1" />
+        <div className="backdrop-orb orb-2" />
+        <div className="backdrop-grid" />
+      </div>
+
       <a href="#main" className="skip-link">Skip to content</a>
+
       <header className="header">
-        <div className="container">
-          <div className="header-content">
-            <div className="logo">
-              <span className="logo-dot" aria-hidden="true" />
-              <span className="logo-text">ots.ashref.tn</span>
-            </div>
-            <nav className="nav">
+        <div className="shell">
+          <div className="header-surface reveal delay-1">
+            <a href="/" className="brand" aria-label="ots.ashref.tn home">
+              <span className="brand-mark" aria-hidden="true">
+                <span className="brand-core" />
+              </span>
+              <span className="brand-text">ots.ashref.tn</span>
+            </a>
+
+            <nav className="nav" aria-label="Primary navigation">
+              <a href="#why">Why</a>
+              <a href="#security">Security</a>
+              <a href="#flow">Flow</a>
+            </nav>
+
+            <div className="header-controls">
               <button
                 type="button"
                 className="theme-toggle"
@@ -50,31 +87,33 @@ function App() {
                 aria-label="Toggle color theme"
                 aria-pressed={theme === 'dark'}
               >
-                <span className="theme-label">Theme</span>
-                <span className="theme-state">{theme === 'light' ? 'Light' : 'Dark'}</span>
-                <span className={`theme-switch ${theme === 'dark' ? 'on' : ''}`} aria-hidden="true" />
+                <span className="theme-icon" aria-hidden="true">
+                  {theme === 'dark' ? <MoonIcon /> : <SunIcon />}
+                </span>
+                <span className="theme-copy">
+                  {theme === 'dark' ? 'Dark' : 'Light'}
+                </span>
               </button>
+
               <details className="about-menu">
                 <summary>About</summary>
                 <div className="about-panel">
                   <p>
-                    One-time secret sharing with client-side encryption. Secrets are deleted after viewing.
+                    One-time secret sharing with client-side encryption. Secrets are burned after viewing.
                   </p>
-                  <p className="about-muted">
-                    Keep the link and passphrase separate for maximum safety.
+                  <p>
+                    Share the link and passphrase separately for the strongest protection.
                   </p>
-                  <p className="about-muted">
-                    made by ashref.tn
-                  </p>
+                  <p className="about-signature">built by ashref.tn</p>
                 </div>
               </details>
-            </nav>
+            </div>
           </div>
         </div>
       </header>
 
       <main id="main" className="main">
-        <div className="container">
+        <div className="shell">
           <Routes>
             <Route path="/" element={<CreateSecret />} />
             <Route path="/s/:id" element={<ViewSecret />} />

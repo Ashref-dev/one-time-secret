@@ -2,12 +2,24 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%239064E8'/><text x='50' y='64' text-anchor='middle' font-size='52' fill='white' font-family='system-ui'>o</text></svg>" />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%236F53EF'/><text x='50' y='64' text-anchor='middle' font-size='52' fill='white' font-family='Inter,system-ui'>o</text></svg>"
+    />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Secure one-time secret sharing with client-side encryption and automatic expiration." />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="description"
+      content="Secure one-time secret sharing with client-side encryption and automatic expiration."
+    />
     <link rel="canonical" href="https://ots.ashref.tn/" />
+
     <meta property="og:title" content="ots.ashref.tn | One-time secret sharing" />
-    <meta property="og:description" content="Secure one-time secret sharing with client-side encryption and automatic expiration." />
+    <meta
+      property="og:description"
+      content="Secure one-time secret sharing with client-side encryption and automatic expiration."
+    />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://ots.ashref.tn/" />
     <meta property="og:image" content="https://ots.ashref.tn/og.svg" />
@@ -15,28 +27,36 @@
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="ots.ashref.tn" />
+
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="ots.ashref.tn | One-time secret sharing" />
-    <meta name="twitter:description" content="Secure one-time secret sharing with client-side encryption and automatic expiration." />
+    <meta
+      name="twitter:description"
+      content="Secure one-time secret sharing with client-side encryption and automatic expiration."
+    />
     <meta name="twitter:image" content="https://ots.ashref.tn/og.svg" />
-    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff" />
-    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0f1014" />
+
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f7fc" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090b14" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+
     <title>ots.ashref.tn | One-time secret sharing</title>
-    <style>
-      * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-      }
-      
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        background: #ffffff;
-        color: #101114;
-        line-height: 1.6;
-        min-height: 100vh;
-      }
-    </style>
+    <script>
+      (function setInitialTheme() {
+        try {
+          var saved = localStorage.getItem('theme');
+          var preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          var theme = saved === 'light' || saved === 'dark' ? saved : preferred;
+          document.documentElement.setAttribute('data-theme', theme);
+        } catch (_) {}
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>
