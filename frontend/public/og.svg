@@ -1,10 +1,50 @@
 <svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <rect width="1200" height="630" fill="#ffffff"/>
-  <rect x="80" y="80" width="1040" height="470" rx="32" fill="#f6f6f9" stroke="#e3e4ea"/>
-  <circle cx="140" cy="140" r="18" fill="#9064E8"/>
-  <text x="180" y="150" font-size="32" font-weight="600" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#101114">ots.ashref.tn</text>
-  <text x="140" y="255" font-size="52" font-weight="600" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#101114">One-time secret sharing</text>
-  <text x="140" y="320" font-size="26" font-weight="400" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#5f636f">Secure, private, and automatic expiration.</text>
-  <rect x="140" y="380" width="210" height="52" rx="26" fill="#9064E8"/>
-  <text x="245" y="414" text-anchor="middle" font-size="20" font-weight="600" font-family="system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#ffffff">Share a secret</text>
+  <defs>
+    <linearGradient id="bg" x1="130" y1="48" x2="1112" y2="606" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10142A"/>
+      <stop offset="1" stop-color="#070A12"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="214" y1="120" x2="949" y2="538" gradientUnits="userSpaceOnUse">
+      <stop stop-color="rgba(255,255,255,0.08)"/>
+      <stop offset="1" stop-color="rgba(255,255,255,0.03)"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="214" y1="94" x2="954" y2="495" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9E89FF"/>
+      <stop offset="1" stop-color="#6B59F5"/>
+    </linearGradient>
+    <filter id="softGlow" x="-120" y="-120" width="1440" height="870" color-interpolation-filters="sRGB">
+      <feGaussianBlur stdDeviation="36"/>
+    </filter>
+  </defs>
+
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <ellipse cx="260" cy="94" rx="190" ry="140" fill="#8E77FF" fill-opacity="0.2" filter="url(#softGlow)"/>
+  <ellipse cx="1004" cy="548" rx="210" ry="158" fill="#5574F4" fill-opacity="0.17" filter="url(#softGlow)"/>
+
+  <rect x="80" y="64" width="1040" height="502" rx="38" fill="url(#panel)" stroke="rgba(199,210,255,0.19)"/>
+  <rect x="98" y="82" width="1004" height="466" rx="30" stroke="rgba(199,210,255,0.12)"/>
+
+  <circle cx="162" cy="138" r="11" fill="url(#accent)"/>
+  <text x="188" y="146" font-size="30" font-weight="600" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#EEF2FF">ots.ashref.tn</text>
+
+  <text x="138" y="270" font-size="72" font-weight="400" font-family="'Instrument Serif', Georgia, serif" fill="#F7F9FF">
+    Share secrets once.
+  </text>
+  <text x="138" y="334" font-size="72" font-weight="400" font-family="'Instrument Serif', Georgia, serif" fill="#F7F9FF">
+    Burn them forever.
+  </text>
+
+  <text x="138" y="392" font-size="29" font-weight="500" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#B8C1E4">
+    End-to-end encrypted one-time links with optional passphrase protection.
+  </text>
+
+  <rect x="138" y="438" width="322" height="64" rx="32" fill="url(#accent)"/>
+  <text x="299" y="479" text-anchor="middle" font-size="25" font-weight="600" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#F8FAFF">
+    Secure one-time link
+  </text>
+
+  <text x="1038" y="482" text-anchor="end" font-size="20" font-weight="500" letter-spacing="0.08em" font-family="Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif" fill="#8F9AC7">
+    PRIVATE  •  FAST  •  EPHEMERAL
+  </text>
 </svg>
