@@ -1,6 +1,7 @@
 package api
 
 import (
+	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"errors"
@@ -8,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-chi/chi/v5"
+	"github.com/jackc/pgx/v5"
 
 	"ots-backend/internal/config"
 	"ots-backend/internal/crypto"
@@ -153,7 +155,7 @@ func (h *Handler) GetSecret(w http.ResponseWriter, r *http.Request) {
 	`, secretID).Scan(&secret.ID, &ciphertext, &iv, &salt, &secret.ExpiresAt, &secret.BurnAfterRead, &secret.CreatedAt)
 
 	if err != nil {
-		if errors.Is(err, errors.New("no rows in result set")) {
+		if errors.Is(err, pgx.ErrNoRows) || errors.Is(err, sql.ErrNoRows) {
 			h.respondError(w, http.StatusNotFound, "not found")
 		} else {
 			logger.Error("database query failed", "error", err, "secret_id", secretID)
