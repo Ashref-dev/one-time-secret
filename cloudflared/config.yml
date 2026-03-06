@@ -1,0 +1,7 @@
+tunnel: 5e297048-9b9b-4b45-855e-b66109b25512
+credentials-file: /etc/cloudflared/5e297048-9b9b-4b45-855e-b66109b25512.json
+
+ingress:
+  - hostname: ots.ashref.tn
+    service: http://127.0.0.1:3069
+  - service: http_status:404
