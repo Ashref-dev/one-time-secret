@@ -7,6 +7,25 @@ import NotFound from './pages/NotFound';
 import ViewSecret from './pages/ViewSecret';
 
 type Theme = 'light' | 'dark';
+const THEME_KEY = 'theme';
+
+function resolveInitialTheme(): Theme {
+  if (typeof window === 'undefined') {
+    return 'dark';
+  }
+
+  const htmlTheme = document.documentElement.getAttribute('data-theme');
+  if (htmlTheme === 'light' || htmlTheme === 'dark') {
+    return htmlTheme;
+  }
+
+  const savedTheme = localStorage.getItem(THEME_KEY);
+  if (savedTheme === 'light' || savedTheme === 'dark') {
+    return savedTheme;
+  }
+
+  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+}
 
 function SunIcon() {
   return (
@@ -26,27 +45,11 @@ function MoonIcon() {
 }
 
 function App() {
-  const [theme, setTheme] = useState<Theme>('dark');
-
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('theme') as Theme | null;
-    if (savedTheme === 'light' || savedTheme === 'dark') {
-      setTheme(savedTheme);
-      return;
-    }
-
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const updateTheme = () => setTheme(media.matches ? 'dark' : 'light');
-
-    updateTheme();
-    media.addEventListener('change', updateTheme);
-
-    return () => media.removeEventListener('change', updateTheme);
-  }, []);
+  const [theme, setTheme] = useState<Theme>(resolveInitialTheme);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('theme', theme);
+    localStorage.setItem(THEME_KEY, theme);
   }, [theme]);
 
   const toggleTheme = () => {
@@ -67,9 +70,7 @@ function App() {
         <div className="shell">
           <div className="header-surface reveal delay-1">
             <a href="/" className="brand" aria-label="ots.ashref.tn home">
-              <span className="brand-mark" aria-hidden="true">
-                <span className="brand-core" />
-              </span>
+              <span className="brand-mark" aria-hidden="true" />
               <span className="brand-text">ots.ashref.tn</span>
             </a>
 

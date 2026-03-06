@@ -1,6 +1,6 @@
 export default function NotFound() {
   return (
-    <section className="state-card reveal delay-2">
+    <section className="state-card view-layout reveal delay-2">
       <div className="not-found">
         <h1>404</h1>
         <h2>Page Not Found</h2>

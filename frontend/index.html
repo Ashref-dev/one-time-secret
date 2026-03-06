@@ -9,32 +9,44 @@
     />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="color-scheme" content="light dark" />
+    <meta name="application-name" content="ots.ashref.tn" />
+    <meta name="author" content="ashref.tn" />
+    <meta name="robots" content="index,follow,max-image-preview:large" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="apple-mobile-web-app-title" content="ots.ashref.tn" />
+    <meta
+      name="keywords"
+      content="one-time secret, secure sharing, encrypted secret link, client-side encryption, ephemeral message, burn after read, ots.ashref.tn"
+    />
     <meta
       name="description"
-      content="Secure one-time secret sharing with client-side encryption and automatic expiration."
+      content="Share sensitive information securely with one-time encrypted links. Client-side encryption, optional passphrase, and automatic burn-after-read."
     />
     <link rel="canonical" href="https://ots.ashref.tn/" />
 
-    <meta property="og:title" content="ots.ashref.tn | One-time secret sharing" />
+    <meta property="og:title" content="ots.ashref.tn | Secure One-Time Secret Sharing" />
     <meta
       property="og:description"
-      content="Secure one-time secret sharing with client-side encryption and automatic expiration."
+      content="Create encrypted one-time links for secrets with burn-after-read and optional passphrase protection."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="en_US" />
     <meta property="og:url" content="https://ots.ashref.tn/" />
     <meta property="og:image" content="https://ots.ashref.tn/og.svg" />
+    <meta property="og:image:alt" content="ots.ashref.tn secure one-time secret sharing preview" />
     <meta property="og:image:type" content="image/svg+xml" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="ots.ashref.tn" />
 
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="ots.ashref.tn | One-time secret sharing" />
+    <meta name="twitter:title" content="ots.ashref.tn | Secure One-Time Secret Sharing" />
     <meta
       name="twitter:description"
-      content="Secure one-time secret sharing with client-side encryption and automatic expiration."
+      content="Create encrypted one-time secret links with automatic burn-after-read and passphrase protection."
     />
     <meta name="twitter:image" content="https://ots.ashref.tn/og.svg" />
+    <meta name="twitter:image:alt" content="ots.ashref.tn secure one-time secret sharing preview" />
 
     <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f5f7fc" />
     <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#090b14" />
@@ -46,11 +58,22 @@
       rel="stylesheet"
     />
 
-    <title>ots.ashref.tn | One-time secret sharing</title>
+    <title>ots.ashref.tn | Secure One-Time Secret Sharing</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "ots.ashref.tn",
+        "url": "https://ots.ashref.tn/",
+        "description": "Secure one-time secret sharing with client-side encryption and automatic burn-after-read.",
+        "inLanguage": "en"
+      }
+    </script>
     <script>
       (function setInitialTheme() {
         try {
-          var saved = localStorage.getItem('theme');
+          var key = 'theme';
+          var saved = localStorage.getItem(key);
           var preferred = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
           var theme = saved === 'light' || saved === 'dark' ? saved : preferred;
           document.documentElement.setAttribute('data-theme', theme);

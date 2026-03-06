@@ -112,7 +112,7 @@ export default function ViewSecret() {
 
   if (loading) {
     return (
-      <section className="state-card reveal delay-2">
+      <section className="state-card view-layout reveal delay-2">
         <div className="state-center">
           <span className="spinner spinner-lg" />
           <p className="state-copy">Retrieving secret...</p>
@@ -123,7 +123,7 @@ export default function ViewSecret() {
 
   if (error && !needsPassphrase) {
     return (
-      <section className="state-card reveal delay-2">
+      <section className="state-card view-layout reveal delay-2">
         <div className="not-found">
           <h1>Secret unavailable</h1>
           <h2>Link not found</h2>
@@ -136,7 +136,7 @@ export default function ViewSecret() {
 
   if (needsPassphrase && encryptedData) {
     return (
-      <section className="state-card reveal delay-2">
+      <section className="state-card view-layout reveal delay-2">
         <div className="surface-header">
           <h1 className="surface-title">Passphrase required</h1>
           <p className="surface-subtitle">This secret is protected with a passphrase. Enter it to decrypt the content.</p>
@@ -173,7 +173,7 @@ export default function ViewSecret() {
 
   if (secret) {
     return (
-      <section className="state-card reveal delay-2">
+      <section className="state-card view-layout reveal delay-2">
         <div className="warning-banner">
           <span>This secret has been permanently deleted from the server</span>
         </div>
@@ -195,7 +195,7 @@ export default function ViewSecret() {
           </p>
         )}
 
-        <div className="info-card compact-info">
+        <div className="note-block">
           <p>
             <strong>Important:</strong> This secret has been burned from the server and cannot be retrieved again.
             Make sure you saved it if needed.
