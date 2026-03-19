@@ -24,9 +24,25 @@ type CreateSecretRequest struct {
 	BurnAfterRead bool   `json:"burn_after_read"`
 }
 
+// AgentCreateSecretRequest represents a convenience request for plaintext uploads.
+type AgentCreateSecretRequest struct {
+	Content    string `json:"content"`
+	Passphrase string `json:"passphrase,omitempty"`
+	ExpiresIn  int    `json:"expires_in,omitempty"`
+}
+
 // CreateSecretResponse represents the response after creating a secret
 type CreateSecretResponse struct {
 	ID string `json:"id"`
+}
+
+// AgentCreateSecretResponse represents the response for agent plaintext uploads.
+type AgentCreateSecretResponse struct {
+	ID                 string    `json:"id"`
+	URL                string    `json:"url"`
+	ExpiresAt          time.Time `json:"expires_at"`
+	ExpiresIn          int       `json:"expires_in"`
+	PassphraseRequired bool      `json:"passphrase_required"`
 }
 
 // GetSecretResponse represents the response when retrieving a secret

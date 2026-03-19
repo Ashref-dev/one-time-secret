@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -15,6 +16,7 @@ import (
 	"ots-backend/internal/crypto"
 	"ots-backend/internal/db"
 	"ots-backend/internal/logger"
+	httpMiddleware "ots-backend/internal/middleware"
 	"ots-backend/internal/models"
 	"ots-backend/internal/validation"
 )
@@ -41,9 +43,10 @@ func (h *Handler) Routes() chi.Router {
 	r.Get("/health/ready", h.ReadinessProbe)
 	r.Get("/health/live", h.LivenessProbe)
 	r.Get("/metrics", h.MetricsHandler)
-	r.Post("/secrets", h.CreateSecret)
-	r.Get("/secrets/{id}", h.GetSecret)
-	r.Delete("/secrets/{id}", h.BurnSecret)
+	r.With(httpMiddleware.RateLimit(h.cfg.WriteRateLimitRequests, h.cfg.WriteRateLimitWindow)).Post("/secrets", h.CreateSecret)
+	r.With(httpMiddleware.RateLimit(h.cfg.AgentRateLimitRequests, h.cfg.AgentRateLimitWindow)).Post("/agent/secrets", h.CreateAgentSecret)
+	r.With(httpMiddleware.RateLimit(h.cfg.ReadRateLimitRequests, h.cfg.ReadRateLimitWindow)).Get("/secrets/{id}", h.GetSecret)
+	r.With(httpMiddleware.RateLimit(h.cfg.WriteRateLimitRequests, h.cfg.WriteRateLimitWindow)).Delete("/secrets/{id}", h.BurnSecret)
 
 	return r
 }
@@ -70,34 +73,13 @@ func (h *Handler) CreateSecret(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		logger.Warn("validation failed", "error", err, "ip", r.RemoteAddr)
 
-		status := http.StatusBadRequest
-		if errors.Is(err, validation.ErrSecretTooLarge) {
-			status = http.StatusRequestEntityTooLarge
-		}
-
-		h.respondError(w, status, err.Error())
+		h.respondValidationError(w, err)
 		return
 	}
 
-	// Generate secret ID
-	secretID, err := crypto.GenerateSecretID()
+	secretID, _, err := h.storeSecret(r, validatedReq)
 	if err != nil {
-		logger.Error("failed to generate secret ID", "error", err)
-		h.respondError(w, http.StatusInternalServerError, "failed to generate secret ID")
-		return
-	}
-
-	// Store in database
-	ctx := r.Context()
-	expiresAt := time.Now().Add(validatedReq.ExpiresIn)
-
-	_, err = h.db.Pool().Exec(ctx, `
-		INSERT INTO secrets (id, ciphertext, iv, salt, expires_at, burn_after_read, created_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7)
-	`, secretID, validatedReq.Ciphertext, validatedReq.IV, validatedReq.Salt, expiresAt, validatedReq.BurnAfterRead, time.Now())
-
-	if err != nil {
-		logger.Error("failed to store secret", "error", err, "secret_id", secretID)
+		logger.Error("failed to store secret", "error", err)
 		h.respondError(w, http.StatusInternalServerError, "failed to store secret")
 		return
 	}
@@ -248,4 +230,32 @@ func (h *Handler) respondError(w http.ResponseWriter, status int, message string
 		Error:   http.StatusText(status),
 		Message: message,
 	})
+}
+
+func (h *Handler) respondValidationError(w http.ResponseWriter, err error) {
+	status := http.StatusBadRequest
+	if errors.Is(err, validation.ErrSecretTooLarge) {
+		status = http.StatusRequestEntityTooLarge
+	}
+
+	h.respondError(w, status, err.Error())
+}
+
+func (h *Handler) storeSecret(r *http.Request, validatedReq *validation.CreateSecretRequest) (string, time.Time, error) {
+	secretID, err := crypto.GenerateSecretID()
+	if err != nil {
+		return "", time.Time{}, fmt.Errorf("generate secret ID: %w", err)
+	}
+
+	expiresAt := time.Now().Add(validatedReq.ExpiresIn)
+
+	_, err = h.db.Pool().Exec(r.Context(), `
+		INSERT INTO secrets (id, ciphertext, iv, salt, expires_at, burn_after_read, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7)
+	`, secretID, validatedReq.Ciphertext, validatedReq.IV, validatedReq.Salt, expiresAt, validatedReq.BurnAfterRead, time.Now())
+	if err != nil {
+		return "", time.Time{}, fmt.Errorf("insert secret: %w", err)
+	}
+
+	return secretID, expiresAt, nil
 }

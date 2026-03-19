@@ -36,7 +36,6 @@ func main() {
 	r.Use(httpMiddleware.SecurityHeaders)
 	r.Use(httpMiddleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(httpMiddleware.RateLimit(cfg.RateLimitRequests, cfg.RateLimitWindow))
 
 	r.Use(cors.Handler(cors.Options{
 		AllowedOrigins:   []string{"*"},

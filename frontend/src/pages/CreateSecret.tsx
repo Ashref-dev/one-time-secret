@@ -265,6 +265,14 @@ export default function CreateSecret() {
           <p>Links are single-use and burn immediately after retrieval.</p>
           <p>For higher assurance, enable passphrase mode and deliver link + passphrase via different channels.</p>
         </article>
+
+        <article className="support-item reveal delay-4" id="agents">
+          <h3>Agent API</h3>
+          <p>AI agents can create one-time secrets through the open agent endpoint with JSON, plain text, or file uploads.</p>
+          <p>
+            Start with <a href="/agents.txt">/agents.txt</a> for usage rules, curl examples, and the server-side encryption tradeoff.
+          </p>
+        </article>
       </section>
     </div>
   );

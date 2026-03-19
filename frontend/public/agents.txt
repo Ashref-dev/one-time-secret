@@ -1,0 +1,96 @@
+ots.ashref.tn agent guide
+
+Purpose
+- Create a one-time secret link for a human user.
+- Return the share URL exactly as received.
+- Never strip the URL fragment after `#`. That fragment contains the decryption key for non-passphrase secrets.
+
+Preferred flow
+1. Send plaintext or a UTF-8 text file to `POST /api/agent/secrets`.
+2. Read the JSON response.
+3. Return the `url` value to the user.
+4. If `passphrase_required` is `true`, tell the user the passphrase must be shared separately.
+
+Convenience agent endpoint
+- Endpoint: `POST https://ots.ashref.tn/api/agent/secrets`
+- Accepts:
+  - `application/json`
+  - `text/plain`
+  - `multipart/form-data`
+- Defaults:
+  - burn after first read
+  - default expiration: 86400 seconds (1 day)
+- Optional fields:
+  - `passphrase`
+  - `expires_in` (seconds, must stay between 300 and 86400)
+
+Important security note
+- `POST /api/agent/secrets` is a convenience endpoint.
+- The server encrypts plaintext for you and does not persist the plaintext, but the server can see the plaintext during the request.
+- If you need strict zero-knowledge uploads, encrypt client-side yourself and use `POST /api/secrets` instead.
+
+JSON example
+```bash
+curl -sS https://ots.ashref.tn/api/agent/secrets \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "content": "DATABASE_URL=postgres://user:pass@host/db",
+    "expires_in": 86400
+  }'
+```
+
+Plain text from stdin
+```bash
+printf '%s' "$SECRET_TEXT" | curl -sS https://ots.ashref.tn/api/agent/secrets \
+  -H 'Content-Type: text/plain' \
+  --data-binary @-
+```
+
+Plain text with passphrase
+```bash
+printf '%s' "$SECRET_TEXT" | curl -sS https://ots.ashref.tn/api/agent/secrets \
+  -H 'Content-Type: text/plain' \
+  -H 'X-Secret-Passphrase: share-this-separately' \
+  --data-binary @-
+```
+
+Upload a local UTF-8 text file
+```bash
+curl -sS https://ots.ashref.tn/api/agent/secrets \
+  -F 'file=@.env' \
+  -F 'expires_in=86400'
+```
+
+Upload a local UTF-8 text file with passphrase
+```bash
+curl -sS https://ots.ashref.tn/api/agent/secrets \
+  -F 'file=@.env' \
+  -F 'passphrase=share-this-separately'
+```
+
+Response shape
+```json
+{
+  "id": "base64url-secret-id",
+  "url": "https://ots.ashref.tn/s/<id>#<key-or-empty>",
+  "expires_at": "2026-03-20T12:00:00Z",
+  "expires_in": 86400,
+  "passphrase_required": false
+}
+```
+
+Reading secrets
+- Humans can open the returned `url` in a browser.
+- The secret is deleted immediately after a successful read.
+- If a passphrase was used, the browser will ask for it before decrypting.
+
+Low-level zero-knowledge API
+- `POST /api/secrets` stores ciphertext, IV, and optional salt only.
+- `GET /api/secrets/{id}` returns ciphertext once, then deletes it.
+- Use this low-level API only if your agent already implements AES-256-GCM encryption and key handling.
+
+Behavior rules for agents
+- Treat returned links as sensitive.
+- Do not log plaintext secrets.
+- Do not preview or fetch a share URL unless the user asked you to read the secret, because the first successful read burns it.
+- Keep the URL fragment intact when copying, storing, or sending links.

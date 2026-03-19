@@ -78,6 +78,7 @@ function App() {
               <a href="#why">Why</a>
               <a href="#security">Security</a>
               <a href="#flow">Flow</a>
+              <a href="#agents">Agents</a>
             </nav>
 
             <div className="header-controls">
@@ -104,6 +105,9 @@ function App() {
                   </p>
                   <p>
                     Share the link and passphrase separately for the strongest protection.
+                  </p>
+                  <p>
+                    Agent instructions live at <a href="/agents.txt">/agents.txt</a>.
                   </p>
                   <p className="about-signature">built by ashref.tn</p>
                 </div>

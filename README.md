@@ -38,10 +38,11 @@ Built with a minimalist, muted purple aesthetic that works in both light and dar
 
 ### 🚀 Production Ready
 - **Atomic Operations** - Row-level database locking prevents race conditions
-- **Rate Limiting** - Configurable per-IP request limits
+- **Rate Limiting** - Configurable per-IP read, write, and agent request limits
 - **Structured Logging** - JSON logs with slog
 - **Health Checks** - Kubernetes-ready endpoints
 - **Docker Compose** - One-command deployment
+- **Agent-Friendly API** - Plaintext/file uploads plus a served `/agents.txt` guide
 
 ### 🛠️ Tech Stack
 - **Backend:** Go (Chi router, pgx PostgreSQL driver)
@@ -177,6 +178,32 @@ See [SECURITY.md](SECURITY.md) for detailed security information.
 
 ## 📚 API Documentation
 
+### Agent Convenience API
+
+```http
+POST /api/agent/secrets
+```
+
+Use this endpoint for AI agents, CLI tools, and automation that need to submit plaintext or UTF-8 text files and receive a ready-to-share secret URL.
+
+- Accepts `application/json`, `text/plain`, and `multipart/form-data`
+- Defaults to 1 day expiration
+- Always creates a one-time secret
+- Supports an optional passphrase
+
+**Response:**
+```json
+{
+  "id": "abc123...",
+  "url": "https://ots.ashref.tn/s/abc123#fragment-key",
+  "expires_at": "2026-03-20T12:00:00Z",
+  "expires_in": 86400,
+  "passphrase_required": false
+}
+```
+
+**Important:** this convenience endpoint encrypts plaintext on the server during the request. If you need strict zero-knowledge uploads, use the encrypted API below and keep encryption client-side.
+
 ### Create Secret
 
 ```http
@@ -237,8 +264,16 @@ DELETE /api/secrets/{id}
 | `DB_NAME` | `ots_db` | PostgreSQL database |
 | `MAX_SECRET_SIZE` | `32768` | Max secret size in bytes (32KB) |
 | `DEFAULT_TTL` | `3600` | Default TTL in seconds (1 hour) |
-| `RATE_LIMIT_REQUESTS` | `30` | Requests per window per IP |
-| `RATE_LIMIT_WINDOW` | `60` | Rate limit window in seconds |
+| `AGENT_DEFAULT_TTL` | `86400` | Default TTL for the agent convenience endpoint |
+| `RATE_LIMIT_REQUESTS` | `30` | Legacy shared rate limit fallback for older configs |
+| `RATE_LIMIT_WINDOW` | `60` | Legacy shared rate limit fallback window |
+| `RATE_LIMIT_WRITE_REQUESTS` | `30` | Create/burn requests per write window per IP |
+| `RATE_LIMIT_WRITE_WINDOW` | `60` | Write rate limit window in seconds |
+| `RATE_LIMIT_READ_REQUESTS` | `180` | Read requests per read window per IP |
+| `RATE_LIMIT_READ_WINDOW` | `60` | Read rate limit window in seconds |
+| `RATE_LIMIT_AGENT_REQUESTS` | `10` | Agent convenience uploads per agent window per IP |
+| `RATE_LIMIT_AGENT_WINDOW` | `60` | Agent rate limit window in seconds |
+| `PUBLIC_BASE_URL` | - | Optional public origin for generated agent share URLs |
 | `LOG_LEVEL` | `info` | Log level (debug/info/warn/error) |
 | `ENV` | `production` | Environment mode |
 
@@ -250,7 +285,11 @@ services:
     environment:
       - DATABASE_URL=postgres://ots_user:${DB_PASSWORD}@postgres:5432/ots_db?sslmode=disable
       - MAX_SECRET_SIZE=32768
-      - RATE_LIMIT_REQUESTS=30
+      - AGENT_DEFAULT_TTL=86400
+      - RATE_LIMIT_WRITE_REQUESTS=30
+      - RATE_LIMIT_READ_REQUESTS=180
+      - RATE_LIMIT_AGENT_REQUESTS=10
+      - PUBLIC_BASE_URL=https://ots.ashref.tn
     deploy:
       resources:
         limits:

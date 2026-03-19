@@ -1,15 +1,18 @@
 package api
 
 import (
+	"bytes"
 	"context"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -212,6 +215,157 @@ func TestCreateSecretErrors(t *testing.T) {
 	}
 }
 
+func TestCreateAgentSecretJSONFlow(t *testing.T) {
+	resetSecretsTable(t, testDB)
+
+	router := newTestRouter(testDB)
+
+	body := marshalJSON(t, models.AgentCreateSecretRequest{
+		Content:   "AGENT_TOKEN=test-value",
+		ExpiresIn: int((1 * time.Hour).Seconds()),
+	})
+
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/agent/secrets", strings.NewReader(body))
+	request.Header.Set("Content-Type", "application/json")
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusCreated {
+		t.Fatalf("CreateAgentSecret() status = %d, want %d", response.Code, http.StatusCreated)
+	}
+
+	var createResponse models.AgentCreateSecretResponse
+	if err := json.NewDecoder(response.Body).Decode(&createResponse); err != nil {
+		t.Fatalf("CreateAgentSecret() decode error: %v", err)
+	}
+
+	if createResponse.ID == "" {
+		t.Fatal("CreateAgentSecret() returned empty ID")
+	}
+
+	if !strings.Contains(createResponse.URL, "/s/"+createResponse.ID+"#") {
+		t.Fatalf("CreateAgentSecret() URL = %q, want fragment share URL", createResponse.URL)
+	}
+
+	if createResponse.PassphraseRequired {
+		t.Fatal("CreateAgentSecret() should not require passphrase for plain uploads")
+	}
+
+	getResponse := httptest.NewRecorder()
+	getRequest := httptest.NewRequest(http.MethodGet, "/api/secrets/"+createResponse.ID, nil)
+	router.ServeHTTP(getResponse, getRequest)
+
+	if getResponse.Code != http.StatusOK {
+		t.Fatalf("GetSecret() status = %d, want %d", getResponse.Code, http.StatusOK)
+	}
+
+	var storedSecret models.GetSecretResponse
+	if err := json.NewDecoder(getResponse.Body).Decode(&storedSecret); err != nil {
+		t.Fatalf("GetSecret() decode error: %v", err)
+	}
+
+	if storedSecret.Ciphertext == "" || storedSecret.IV == "" {
+		t.Fatal("GetSecret() returned incomplete encrypted payload")
+	}
+}
+
+func TestCreateAgentSecretMultipartWithPassphrase(t *testing.T) {
+	resetSecretsTable(t, testDB)
+
+	router := newTestRouter(testDB)
+
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+
+	if err := writer.WriteField("passphrase", "shared-secret"); err != nil {
+		t.Fatalf("WriteField(passphrase) error: %v", err)
+	}
+
+	if err := writer.WriteField("expires_in", strconv.Itoa(int((30 * time.Minute).Seconds()))); err != nil {
+		t.Fatalf("WriteField(expires_in) error: %v", err)
+	}
+
+	fileWriter, err := writer.CreateFormFile("file", ".env")
+	if err != nil {
+		t.Fatalf("CreateFormFile() error: %v", err)
+	}
+
+	if _, err := fileWriter.Write([]byte("DATABASE_URL=postgres://secret")); err != nil {
+		t.Fatalf("fileWriter.Write() error: %v", err)
+	}
+
+	if err := writer.Close(); err != nil {
+		t.Fatalf("writer.Close() error: %v", err)
+	}
+
+	response := httptest.NewRecorder()
+	request := httptest.NewRequest(http.MethodPost, "/api/agent/secrets", &body)
+	request.Header.Set("Content-Type", writer.FormDataContentType())
+	router.ServeHTTP(response, request)
+
+	if response.Code != http.StatusCreated {
+		t.Fatalf("CreateAgentSecret() status = %d, want %d", response.Code, http.StatusCreated)
+	}
+
+	var createResponse models.AgentCreateSecretResponse
+	if err := json.NewDecoder(response.Body).Decode(&createResponse); err != nil {
+		t.Fatalf("CreateAgentSecret() decode error: %v", err)
+	}
+
+	if !createResponse.PassphraseRequired {
+		t.Fatal("CreateAgentSecret() should require passphrase")
+	}
+
+	if strings.Contains(createResponse.URL, "#") {
+		t.Fatalf("CreateAgentSecret() URL = %q, want passphrase URLs without fragment key", createResponse.URL)
+	}
+}
+
+func TestCreateAgentSecretErrors(t *testing.T) {
+	resetSecretsTable(t, testDB)
+
+	router := newTestRouter(testDB)
+
+	tests := []struct {
+		name        string
+		body        string
+		contentType string
+		wantStatus  int
+	}{
+		{
+			name:        "invalid ttl",
+			body:        `{"content":"hello","expires_in":60}`,
+			contentType: "application/json",
+			wantStatus:  http.StatusBadRequest,
+		},
+		{
+			name:        "unsupported content type",
+			body:        "<secret>hello</secret>",
+			contentType: "application/xml",
+			wantStatus:  http.StatusBadRequest,
+		},
+		{
+			name:        "empty text body",
+			body:        "",
+			contentType: "text/plain",
+			wantStatus:  http.StatusBadRequest,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			response := httptest.NewRecorder()
+			request := httptest.NewRequest(http.MethodPost, "/api/agent/secrets", strings.NewReader(tt.body))
+			request.Header.Set("Content-Type", tt.contentType)
+			router.ServeHTTP(response, request)
+
+			if response.Code != tt.wantStatus {
+				t.Fatalf("CreateAgentSecret() status = %d, want %d", response.Code, tt.wantStatus)
+			}
+		})
+	}
+}
+
 func TestGetSecretErrors(t *testing.T) {
 	resetSecretsTable(t, testDB)
 
@@ -330,7 +484,14 @@ func resetSecretsTable(t *testing.T, database *db.DB) {
 
 func newTestRouter(database *db.DB) chi.Router {
 	cfg := &config.Config{
-		MaxSecretSize: 32768,
+		MaxSecretSize:          32768,
+		AgentDefaultTTL:        24 * time.Hour,
+		WriteRateLimitRequests: 1000,
+		WriteRateLimitWindow:   time.Minute,
+		ReadRateLimitRequests:  1000,
+		ReadRateLimitWindow:    time.Minute,
+		AgentRateLimitRequests: 1000,
+		AgentRateLimitWindow:   time.Minute,
 	}
 
 	handler := NewHandler(database, cfg)

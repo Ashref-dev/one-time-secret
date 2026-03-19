@@ -15,6 +15,8 @@ var (
 	ErrInvalidIV = errors.New("invalid IV format")
 	// ErrInvalidSalt indicates invalid salt format
 	ErrInvalidSalt = errors.New("invalid salt format")
+	// ErrInvalidPlaintext indicates invalid plaintext content
+	ErrInvalidPlaintext = errors.New("invalid plaintext content")
 	// ErrInvalidSecretID indicates invalid secret ID
 	ErrInvalidSecretID = errors.New("invalid secret ID")
 	// ErrInvalidTTL indicates invalid TTL value
@@ -84,25 +86,9 @@ func ValidateCreateRequest(ciphertextB64, ivB64, saltB64 string, expiresIn int, 
 		if err != nil {
 			return nil, fmt.Errorf("%w: %v", ErrInvalidSalt, err)
 		}
-		// Salt should be at least 16 bytes
-		if len(salt) < 16 {
-			return nil, fmt.Errorf("%w: salt must be at least 16 bytes", ErrInvalidSalt)
-		}
 	}
 
-	// Validate TTL
-	ttl := time.Duration(expiresIn) * time.Second
-	if ttl < MinTTL || ttl > MaxTTL {
-		return nil, fmt.Errorf("%w: must be between %v and %v", ErrInvalidTTL, MinTTL, MaxTTL)
-	}
-
-	return &CreateSecretRequest{
-		Ciphertext:    ciphertext,
-		IV:            iv,
-		Salt:          salt,
-		ExpiresIn:     ttl,
-		BurnAfterRead: true, // Always burn after read for security
-	}, nil
+	return ValidateEncryptedPayload(ciphertext, iv, salt, expiresIn, maxSize)
 }
 
 // ValidateSecretID validates a secret ID format
@@ -116,4 +102,59 @@ func ValidateSecretID(id string) error {
 	}
 
 	return nil
+}
+
+// ValidatePlaintextContent validates a plaintext secret payload before encryption.
+func ValidatePlaintextContent(content []byte, maxSize int) error {
+	if len(content) < MinSecretSize {
+		return fmt.Errorf("%w: content is required", ErrInvalidPlaintext)
+	}
+
+	if len(content) > maxSize {
+		return fmt.Errorf("%w: %d bytes (max %d)", ErrSecretTooLarge, len(content), maxSize)
+	}
+
+	return nil
+}
+
+// ValidateTTL validates a TTL in seconds.
+func ValidateTTL(expiresIn int) (time.Duration, error) {
+	ttl := time.Duration(expiresIn) * time.Second
+	if ttl < MinTTL || ttl > MaxTTL {
+		return 0, fmt.Errorf("%w: must be between %v and %v", ErrInvalidTTL, MinTTL, MaxTTL)
+	}
+
+	return ttl, nil
+}
+
+// ValidateEncryptedPayload validates already-decoded encrypted secret material.
+func ValidateEncryptedPayload(ciphertext, iv, salt []byte, expiresIn int, maxSize int) (*CreateSecretRequest, error) {
+	if len(ciphertext) < MinSecretSize {
+		return nil, fmt.Errorf("%w: ciphertext too small", ErrInvalidCiphertext)
+	}
+
+	if len(ciphertext) > maxSize {
+		return nil, fmt.Errorf("%w: %d bytes (max %d)", ErrSecretTooLarge, len(ciphertext), maxSize)
+	}
+
+	if len(iv) != 12 {
+		return nil, fmt.Errorf("%w: IV must be 12 bytes, got %d", ErrInvalidIV, len(iv))
+	}
+
+	if len(salt) > 0 && len(salt) < 16 {
+		return nil, fmt.Errorf("%w: salt must be at least 16 bytes", ErrInvalidSalt)
+	}
+
+	ttl, err := ValidateTTL(expiresIn)
+	if err != nil {
+		return nil, err
+	}
+
+	return &CreateSecretRequest{
+		Ciphertext:    ciphertext,
+		IV:            iv,
+		Salt:          salt,
+		ExpiresIn:     ttl,
+		BurnAfterRead: true,
+	}, nil
 }

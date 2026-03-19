@@ -178,3 +178,78 @@ func TestValidateSecretID(t *testing.T) {
 		})
 	}
 }
+
+func TestValidatePlaintextContent(t *testing.T) {
+	tests := []struct {
+		name    string
+		content []byte
+		maxSize int
+		wantErr bool
+		errType error
+	}{
+		{
+			name:    "valid content",
+			content: []byte("hello"),
+			maxSize: 32,
+		},
+		{
+			name:    "empty content",
+			content: []byte{},
+			maxSize: 32,
+			wantErr: true,
+			errType: ErrInvalidPlaintext,
+		},
+		{
+			name:    "content too large",
+			content: []byte("this is larger than the configured maximum"),
+			maxSize: 8,
+			wantErr: true,
+			errType: ErrSecretTooLarge,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			err := ValidatePlaintextContent(tt.content, tt.maxSize)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ValidatePlaintextContent() error = %v, wantErr %v", err, tt.wantErr)
+			}
+
+			if tt.wantErr && !errors.Is(err, tt.errType) {
+				t.Fatalf("ValidatePlaintextContent() error = %v, want %v", err, tt.errType)
+			}
+		})
+	}
+}
+
+func TestValidateTTL(t *testing.T) {
+	tests := []struct {
+		name      string
+		expiresIn int
+		wantErr   bool
+	}{
+		{
+			name:      "valid ttl",
+			expiresIn: 3600,
+		},
+		{
+			name:      "ttl too short",
+			expiresIn: 60,
+			wantErr:   true,
+		},
+		{
+			name:      "ttl too long",
+			expiresIn: int((25 * time.Hour).Seconds()),
+			wantErr:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			_, err := ValidateTTL(tt.expiresIn)
+			if (err != nil) != tt.wantErr {
+				t.Fatalf("ValidateTTL() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

@@ -2,7 +2,10 @@ package middleware
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
+	"strconv"
+	"strings"
 	"sync"
 	"time"
 
@@ -43,6 +46,13 @@ type RateLimiter struct {
 	window   time.Duration
 }
 
+type rateLimitResult struct {
+	Allowed    bool
+	Limit      int
+	Remaining  int
+	RetryAfter time.Duration
+}
+
 // RateLimit creates a middleware that limits requests per IP
 func RateLimit(maxRequests int, window time.Duration) func(http.Handler) http.Handler {
 	limiter := &RateLimiter{
@@ -56,16 +66,24 @@ func RateLimit(maxRequests int, window time.Duration) func(http.Handler) http.Ha
 
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-			ip := r.RemoteAddr
-			if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
-				ip = forwarded
-			}
+			ip := getClientIP(r)
+			result := limiter.allow(ip)
 
-			if !limiter.allow(ip) {
+			w.Header().Set("X-RateLimit-Limit", strconv.Itoa(result.Limit))
+			w.Header().Set("X-RateLimit-Remaining", strconv.Itoa(result.Remaining))
+
+			if !result.Allowed {
+				retryAfterSeconds := int(result.RetryAfter.Seconds())
+				if retryAfterSeconds < 1 {
+					retryAfterSeconds = 1
+				}
+
+				w.Header().Set("Retry-After", strconv.Itoa(retryAfterSeconds))
 				w.Header().Set("Content-Type", "application/json")
 				w.WriteHeader(http.StatusTooManyRequests)
 				json.NewEncoder(w).Encode(map[string]string{
-					"error": "rate limit exceeded",
+					"error":   "rate limit exceeded",
+					"message": "too many requests from this IP, please retry later",
 				})
 				return
 			}
@@ -75,7 +93,7 @@ func RateLimit(maxRequests int, window time.Duration) func(http.Handler) http.Ha
 	}
 }
 
-func (rl *RateLimiter) allow(ip string) bool {
+func (rl *RateLimiter) allow(ip string) rateLimitResult {
 	rl.mu.Lock()
 	defer rl.mu.Unlock()
 
@@ -86,7 +104,11 @@ func (rl *RateLimiter) allow(ip string) bool {
 		rl.requests[ip] = &rateLimitEntry{
 			requests: []time.Time{now},
 		}
-		return true
+		return rateLimitResult{
+			Allowed:   true,
+			Limit:     rl.maxReq,
+			Remaining: max(rl.maxReq-1, 0),
+		}
 	}
 
 	// Remove old requests outside the window
@@ -99,12 +121,26 @@ func (rl *RateLimiter) allow(ip string) bool {
 
 	if len(validRequests) >= rl.maxReq {
 		rl.requests[ip].requests = validRequests
-		return false
+		retryAfter := rl.window
+		if len(validRequests) > 0 {
+			retryAfter = rl.window - now.Sub(validRequests[0])
+		}
+
+		return rateLimitResult{
+			Allowed:    false,
+			Limit:      rl.maxReq,
+			Remaining:  0,
+			RetryAfter: retryAfter,
+		}
 	}
 
 	validRequests = append(validRequests, now)
 	rl.requests[ip].requests = validRequests
-	return true
+	return rateLimitResult{
+		Allowed:   true,
+		Limit:     rl.maxReq,
+		Remaining: max(rl.maxReq-len(validRequests), 0),
+	}
 }
 
 func (rl *RateLimiter) cleanup() {
@@ -129,4 +165,32 @@ func (rl *RateLimiter) cleanup() {
 		}
 		rl.mu.Unlock()
 	}
+}
+
+func getClientIP(r *http.Request) string {
+	if forwarded := r.Header.Get("X-Forwarded-For"); forwarded != "" {
+		parts := strings.Split(forwarded, ",")
+		if len(parts) > 0 {
+			return strings.TrimSpace(parts[0])
+		}
+	}
+
+	if realIP := strings.TrimSpace(r.Header.Get("X-Real-IP")); realIP != "" {
+		return realIP
+	}
+
+	host, _, err := net.SplitHostPort(strings.TrimSpace(r.RemoteAddr))
+	if err == nil {
+		return host
+	}
+
+	return strings.TrimSpace(r.RemoteAddr)
+}
+
+func max(a, b int) int {
+	if a > b {
+		return a
+	}
+
+	return b
 }
