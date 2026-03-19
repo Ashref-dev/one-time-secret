@@ -7,8 +7,8 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
-API_URL="${API_URL:-http://localhost:8080}"
-FRONTEND_URL="${FRONTEND_URL:-http://localhost:5173}"
+API_URL="${API_URL:-http://localhost:3069}"
+FRONTEND_URL="${FRONTEND_URL:-http://localhost:3069}"
 
 echo "=========================================="
 echo "Pre-Deployment Verification Script"
@@ -49,7 +49,7 @@ echo "2. Checking API Functionality..."
 echo "   - Create secret"
 SECRET_RESPONSE=$(curl -s -X POST "$API_URL/api/secrets" \
     -H "Content-Type: application/json" \
-    -d '{"ciphertext":"dGVzdA==","iv":"dGVzdA==","expires_in":3600}' || echo "")
+    -d '{"ciphertext":"dGVzdCBzZWNyZXQ=","iv":"AAAAAAAAAAAAAAAA","expires_in":3600}' || echo "")
 
 if echo "$SECRET_RESPONSE" | grep -q '"id"'; then
     SECRET_ID=$(echo "$SECRET_RESPONSE" | grep -o '"id":"[^"]*"' | cut -d'"' -f4)
