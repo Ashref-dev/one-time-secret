@@ -231,11 +231,11 @@ select {
 }
 
 .header {
-  position: sticky;
-  top: 0;
+  position: fixed;
+  top: 1rem;
+  left: 0;
+  right: 0;
   z-index: 50;
-  padding: clamp(0.55rem, 1.5vw, 0.75rem) 0;
-  backdrop-filter: saturate(1.2);
 }
 
 .shell {
@@ -244,12 +244,13 @@ select {
 }
 
 .header-surface {
-  min-height: var(--header-height);
-  padding: clamp(0.62rem, 1.4vw, 0.9rem);
+  padding: 0.8rem 1rem;
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-subtle);
-  background: var(--bg-frost);
-  box-shadow: var(--shadow-md);
+  background: linear-gradient(145deg, var(--bg-frost), rgba(255, 255, 255, 0.04));
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-sm);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -331,32 +332,16 @@ select {
 }
 
 .main {
-  padding: 1rem 0 2.5rem;
+  padding: 5.5rem 0 2.5rem;
 }
 
 .eyebrow {
-  margin: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.36rem;
-  width: fit-content;
-  padding: 0.34rem 0.62rem;
-  border-radius: var(--radius-pill);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-overlay);
+  margin: 0 0 0.5rem;
   color: var(--text-muted);
-  font-size: 0.68rem;
-  letter-spacing: 0.11em;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   text-transform: uppercase;
-}
-
-.eyebrow::before {
-  content: '';
-  width: 0.4rem;
-  height: 0.4rem;
-  border-radius: 50%;
-  background: var(--accent);
-  box-shadow: 0 0 0 5px var(--accent-soft);
 }
 
 .create-layout {
@@ -369,7 +354,14 @@ select {
 .create-hero {
   display: grid;
   gap: 0.62rem;
-  padding: 0.15rem 0.15rem 0.3rem;
+  text-align: center;
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
 }
 
 .hero-title {
@@ -383,8 +375,8 @@ select {
 }
 
 .hero-description {
-  margin: 0;
-  max-width: 66ch;
+  margin: 0 auto;
+  max-width: 62ch;
   color: var(--text-secondary);
   font-size: 0.9rem;
 }
@@ -517,10 +509,11 @@ select {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0.7rem;
+  align-items: start;
 }
 
 .switch {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 0.58rem;
   cursor: pointer;
@@ -1012,7 +1005,7 @@ summary:focus-visible {
 
 @media (max-width: 560px) {
   .main {
-    padding-top: 0.95rem;
+    padding-top: 5rem;
   }
 
   .header-surface {
@@ -1037,7 +1030,6 @@ summary:focus-visible {
   }
 
   .create-hero {
-    padding-inline: 0.05rem;
     gap: 0.62rem;
   }
 
