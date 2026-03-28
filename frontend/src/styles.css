@@ -268,66 +268,21 @@ select {
 }
 
 .brand-mark {
-  width: 0.5em;
-  height: 0.5em;
-  display: inline-block;
-  flex-shrink: 0;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 0 1px var(--accent-soft-2), 0 0 14px var(--accent-soft-2);
+  box-shadow: 0 0 0 6px rgba(164, 139, 255, 0.16), 0 0 20px rgba(164, 139, 255, 0.65);
+  flex-shrink: 0;
+  display: inline-block;
 }
 
 .brand-text {
   font-size: 1rem;
-  font-weight: 500;
+  font-weight: 600;
   line-height: 1;
   letter-spacing: 0.01em;
   white-space: nowrap;
-}
-
-.nav {
-  display: flex;
-  align-items: center;
-  gap: clamp(0.7rem, 2vw, 1.4rem);
-  scrollbar-width: none;
-}
-
-.nav::-webkit-scrollbar {
-  display: none;
-}
-
-.nav a {
-  display: inline-flex;
-  align-items: center;
-  color: var(--text-muted);
-  font-size: 0.86rem;
-  min-height: var(--touch-target);
-  white-space: nowrap;
-  padding: 0.2rem 0;
-  position: relative;
-  transition: color var(--transition-fast);
-}
-
-.nav a::after {
-  content: '';
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: -0.25rem;
-  height: 2px;
-  border-radius: 99px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: center;
-  transition: transform var(--transition-fast);
-}
-
-.nav a:hover {
-  color: var(--text-primary);
-}
-
-.nav a:hover::after {
-  transform: scaleX(1);
 }
 
 .header-controls {
@@ -338,8 +293,7 @@ select {
   flex-wrap: wrap;
 }
 
-.theme-toggle,
-.about-menu summary {
+.theme-toggle {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -354,67 +308,26 @@ select {
   transition: border-color var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast), background var(--transition-fast);
 }
 
-.theme-toggle:hover,
-.about-menu summary:hover,
-.about-menu[open] summary {
+.theme-toggle:hover {
   border-color: var(--border-strong);
   box-shadow: var(--shadow-sm);
   transform: translateY(-1px);
 }
 
-.theme-icon {
-  width: 1.15rem;
-  height: 1.15rem;
-  display: inline-flex;
-  transition: transform var(--transition-fast);
+.theme-toggle-icon {
+  display: inline-block;
+  font-size: 0.9rem;
+  transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1), opacity 150ms ease;
 }
 
-.theme-icon svg {
-  width: 100%;
-  height: 100%;
+.theme-toggle-icon.animating {
+  transform: scale(0.5) rotate(90deg);
+  opacity: 0;
 }
 
-.theme-copy {
-  font-size: 0.78rem;
+.theme-toggle-label {
+  font-size: 0.88rem;
   color: var(--text-secondary);
-}
-
-.about-menu {
-  position: relative;
-}
-
-.about-menu summary {
-  list-style: none;
-  font-size: 0.78rem;
-  font-weight: 500;
-}
-
-.about-menu summary::-webkit-details-marker {
-  display: none;
-}
-
-.about-panel {
-  position: absolute;
-  right: 0;
-  top: calc(100% + 0.55rem);
-  width: min(300px, 90vw);
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-subtle);
-  background: var(--bg-surface-strong);
-  box-shadow: var(--shadow-lg);
-  padding: 1rem;
-  z-index: 20;
-  color: var(--text-secondary);
-  display: grid;
-  gap: 0.6rem;
-  font-size: 0.84rem;
-}
-
-.about-signature {
-  color: var(--text-muted);
-  text-transform: uppercase;
-  font-size: 0.73rem;
-  letter-spacing: 0.08em;
 }
 
 .main {
@@ -1037,6 +950,24 @@ summary:focus-visible {
   }
 }
 
+.site-footer {
+  padding: 1.4rem 0 2rem;
+}
+.site-footer p {
+  margin: 0;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.site-footer a {
+  color: var(--accent-strong);
+  text-decoration: none;
+  font-weight: 600;
+}
+.site-footer a:hover {
+  text-decoration: underline;
+}
+
 @media (max-width: 1120px) {
   .create-layout {
     width: 100%;
@@ -1064,20 +995,6 @@ summary:focus-visible {
   .brand-text {
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-
-  .nav {
-    order: 3;
-    grid-column: 1 / -1;
-    justify-content: flex-start;
-    overflow-x: auto;
-    padding-bottom: 0.2rem;
-    scrollbar-width: thin;
-    scroll-snap-type: x proximity;
-  }
-
-  .nav a {
-    scroll-snap-align: start;
   }
 
   .support-grid {
