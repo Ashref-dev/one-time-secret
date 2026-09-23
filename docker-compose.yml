@@ -1,13 +1,13 @@
 services:
   postgres:
-    image: postgres:alpine
+    image: postgres:18-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${DB_USER:-ots_user}
       POSTGRES_PASSWORD: ${DB_PASSWORD:-secure_password_change_in_production}
       POSTGRES_DB: ${DB_NAME:-ots_db}
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
       - ./backend/migrations:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]

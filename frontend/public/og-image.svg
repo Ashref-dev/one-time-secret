@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FF7A45"/>
+      <stop offset="1" stop-color="#F43F5E"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="115%" r="75%">
+      <stop offset="0" stop-color="#FF4D15" stop-opacity="0.22"/>
+      <stop offset="0.6" stop-color="#FF4D15" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#0A0A0B"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <g transform="translate(568,148)">
+    <path fill="url(#flame)" d="M32 8c.9 4.5 3.6 8.8 7.2 11.7 3.6 2.9 5.4 6.3 5.4 9.9a12.6 12.6 0 1 1-25.2 0c0-2.1.8-4.1 1.8-5.4a4.5 4.5 0 0 0 4.5 4.5A4.5 4.5 0 0 0 30 24c0-2.5-.9-3.6-1.8-5.4-1.9-3.9-.4-7.3 3.8-10.6z"/>
+  </g>
+  <text x="600" y="330" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="84" font-weight="700" letter-spacing="2" fill="#EDEAE4">ots.achraf.tn</text>
+  <text x="600" y="392" text-anchor="middle" font-family="ui-monospace,SFMono-Regular,Menlo,Consolas,monospace" font-size="30" letter-spacing="8" fill="#777C88">ONE-TIME SECRETS · SINGLE READ · ZERO LOGS</text>
+  <rect x="560" y="432" width="80" height="4" rx="2" fill="#FF4D15"/>
+</svg>
