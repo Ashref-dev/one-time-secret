@@ -1,0 +1,184 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --font-display: 'Syne', sans-serif;
+    --font-sans: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    --bg: #0A0A0B;
+    --bone: #EDEAE4;
+    --pewter: #777C88;
+    --graphite: #2E323B;
+    --thermite: #FF4D15;
+    --amber: #FFB800;
+    --emerald: #10E88A;
+  }
+
+  html, body, #root {
+    height: 100%;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background: var(--bg);
+    color: var(--bone);
+    overflow: hidden;
+    font-feature-settings: "ss01" 1, "zero" 1;
+  }
+
+  /* Native cursor — no custom takeover */
+
+  /* Whisper scrollbars + smooth glide */
+  .smooth-scroll { scroll-behavior: smooth; }
+
+  :root { color-scheme: dark; }
+
+  /* Chromium: fully custom ghost bars (a `scrollbar-width` keyword would
+     force native rendering and override these, so it stays Firefox-only) */
+  *::-webkit-scrollbar { width: 7px; height: 7px; }
+  *::-webkit-scrollbar-track { background: transparent; }
+  *::-webkit-scrollbar-thumb {
+    background: rgba(237, 234, 228, 0.02);
+    border-radius: 999px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  *::-webkit-scrollbar-thumb:hover { background: rgba(237, 234, 228, 0.1); }
+
+  /* Firefox only */
+  @-moz-document url-prefix() {
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: rgba(237, 234, 228, 0.02) transparent;
+    }
+  }
+
+  code, pre, .font-mono-tabular {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "zero" 1;
+  }
+
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+/* ---------- film grain ---------- */
+.grain-overlay {
+  position: fixed;
+  inset: -50%;
+  width: 200%;
+  height: 200%;
+  pointer-events: none;
+  z-index: 90;
+  opacity: 0.055;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 300 300' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain-shift 0.9s steps(6) infinite;
+}
+
+@keyframes grain-shift {
+  0% { transform: translate(0, 0); }
+  20% { transform: translate(-2%, 1%); }
+  40% { transform: translate(1%, -2%); }
+  60% { transform: translate(-1%, 2%); }
+  80% { transform: translate(2%, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+/* ---------- ambient dust motes ---------- */
+@keyframes dust-float {
+  0%, 100% { transform: translateY(0) translateX(0); opacity: 0; }
+  12% { opacity: var(--mote-o, 0.5); }
+  88% { opacity: var(--mote-o, 0.5); }
+  50% { transform: translateY(-46px) translateX(var(--mote-x, 12px)); }
+}
+
+.dust-mote {
+  animation: dust-float var(--mote-d, 12s) ease-in-out infinite;
+  animation-delay: var(--mote-delay, 0s);
+}
+
+/* ---------- slow orbit rotation (SVG ring text / decorative arcs) ---------- */
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+.spin-slower { animation: spin-slow 42s linear infinite; transform-origin: center; }
+.spin-rev    { animation: spin-slow 30s linear infinite reverse; transform-origin: center; }
+
+/* ---------- mobile GPU relief: kill the animated grain layer ---------- */
+@media (max-width: 768px), (pointer: coarse) {
+  .grain-overlay { display: none; }
+  /* full-strength backdrop blur melts weak GPUs: step it down on touch */
+  .forge-veil {
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+  }
+}
+
+/* ---------- capsule entrance ---------- */
+@keyframes char-reveal {
+  from { opacity: 0; transform: translateY(14px) scale(0.96); filter: blur(6px); }
+  to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+}
+
+@keyframes hud-fade {
+  from { opacity: 0; transforM: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hud-fade { animation: hud-fade 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+/* ---------- mobile burn: single opacity fade, no per-letter layers ---------- */
+@keyframes burn-simple {
+  to { opacity: 0; }
+}
+
+.burn-simple { animation: burn-simple 0.5s ease-in both; }
+
+/* ---------- block fiery dissolve, synced to the ember hit ---------- */
+@keyframes burn-dissolve {
+  0%   { opacity: 1; filter: blur(0) brightness(1); transform: translateY(0) scale(1); }
+  15%  { opacity: 1; filter: blur(1px) brightness(2); transform: translateY(-5px) scale(1.006); }
+  55%  { opacity: 0.5; filter: blur(4px) brightness(2.5); transform: translateY(-12px) scale(1.02); }
+  100% { opacity: 0; filter: blur(10px) brightness(3); transform: translateY(-24px) scale(1.04); }
+}
+
+.burn-dissolve { animation: burn-dissolve 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
+@keyframes forge-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes forge-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+.forge-enter { animation: forge-in 0.32s cubic-bezier(0.22, 1, 0.36, 1) both; }
+.forge-exit { animation: forge-out 0.2s ease-in both; }
+
+/* ---------- app boot + stage crossfade curtain ---------- */
+@keyframes app-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.app-enter { animation: app-in 0.45s ease-out both; }
+
+@keyframes stage-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.stage-view { transition: opacity 0.18s ease, transform 0.18s ease; }
+.stage-view.leaving { opacity: 0; transform: translateY(-8px); }
+.stage-view.entering { animation: stage-in 0.3s cubic-bezier(0.22, 1, 0.36, 1) both; }
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}

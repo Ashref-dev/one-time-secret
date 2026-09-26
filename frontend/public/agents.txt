@@ -1,4 +1,4 @@
-ots.ashref.tn agent guide
+ots.achraf.tn agent guide
 
 Purpose
 - Create a one-time secret link for a human user.
@@ -12,7 +12,7 @@ Preferred flow
 4. If `passphrase_required` is `true`, tell the user the passphrase must be shared separately.
 
 Convenience agent endpoint
-- Endpoint: `POST https://ots.ashref.tn/api/agent/secrets`
+- Endpoint: `POST https://ots.achraf.tn/api/agent/secrets`
 - Accepts:
   - `application/json`
   - `text/plain`
@@ -31,7 +31,7 @@ Important security note
 
 JSON example
 ```bash
-curl -sS https://ots.ashref.tn/api/agent/secrets \
+curl -sS https://ots.achraf.tn/api/agent/secrets \
   -H 'Content-Type: application/json' \
   -d '{
     "content": "DATABASE_URL=postgres://user:pass@host/db",
@@ -41,14 +41,14 @@ curl -sS https://ots.ashref.tn/api/agent/secrets \
 
 Plain text from stdin
 ```bash
-printf '%s' "$SECRET_TEXT" | curl -sS https://ots.ashref.tn/api/agent/secrets \
+printf '%s' "$SECRET_TEXT" | curl -sS https://ots.achraf.tn/api/agent/secrets \
   -H 'Content-Type: text/plain' \
   --data-binary @-
 ```
 
 Plain text with passphrase
 ```bash
-printf '%s' "$SECRET_TEXT" | curl -sS https://ots.ashref.tn/api/agent/secrets \
+printf '%s' "$SECRET_TEXT" | curl -sS https://ots.achraf.tn/api/agent/secrets \
   -H 'Content-Type: text/plain' \
   -H 'X-Secret-Passphrase: share-this-separately' \
   --data-binary @-
@@ -56,14 +56,14 @@ printf '%s' "$SECRET_TEXT" | curl -sS https://ots.ashref.tn/api/agent/secrets \
 
 Upload a local UTF-8 text file
 ```bash
-curl -sS https://ots.ashref.tn/api/agent/secrets \
+curl -sS https://ots.achraf.tn/api/agent/secrets \
   -F 'file=@.env' \
   -F 'expires_in=86400'
 ```
 
 Upload a local UTF-8 text file with passphrase
 ```bash
-curl -sS https://ots.ashref.tn/api/agent/secrets \
+curl -sS https://ots.achraf.tn/api/agent/secrets \
   -F 'file=@.env' \
   -F 'passphrase=share-this-separately'
 ```
@@ -72,7 +72,7 @@ Response shape
 ```json
 {
   "id": "base64url-secret-id",
-  "url": "https://ots.ashref.tn/s/<id>#<key-or-empty>",
+  "url": "https://ots.achraf.tn/s/<id>#<key-or-empty>",
   "expires_at": "2026-03-20T12:00:00Z",
   "expires_in": 86400,
   "passphrase_required": false

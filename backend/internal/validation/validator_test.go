@@ -102,7 +102,7 @@ func TestValidateCreateRequest(t *testing.T) {
 			name:       "TTL too long",
 			ciphertext: validCiphertext,
 			iv:         validIV,
-			expiresIn:  int(25 * time.Hour.Seconds()),
+			expiresIn:  int(73 * time.Hour.Seconds()),
 			maxSize:    32768,
 			wantErr:    true,
 			errType:    ErrInvalidTTL,
@@ -239,7 +239,7 @@ func TestValidateTTL(t *testing.T) {
 		},
 		{
 			name:      "ttl too long",
-			expiresIn: int((25 * time.Hour).Seconds()),
+			expiresIn: int((73 * time.Hour).Seconds()),
 			wantErr:   true,
 		},
 	}

@@ -28,7 +28,7 @@ var (
 const (
 	MaxSecretSize   = 32768 // 32KB
 	MinSecretSize   = 1
-	MaxTTL          = 24 * time.Hour
+	MaxTTL          = 72 * time.Hour
 	MinTTL          = 5 * time.Minute
 	SecretIDPattern = `^[A-Za-z0-9_-]{22}$` // Base64URL encoding of 16 bytes
 )
