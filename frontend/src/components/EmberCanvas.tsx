@@ -35,6 +35,21 @@ export function EmberCanvas({ active, onSettled }: EmberCanvasProps) {
     const cx = W / 2;
     const cy = H / 2;
 
+    // Pre-rendered glow sprite: shadowBlur forces an offscreen pass per
+    // ember per frame, drawImage of a cached gradient does not.
+    const glow = document.createElement('canvas');
+    glow.width = 32;
+    glow.height = 32;
+    const gg = glow.getContext('2d');
+    if (gg) {
+      const grad = gg.createRadialGradient(16, 16, 0, 16, 16, 16);
+      grad.addColorStop(0, 'rgba(255,140,70,1)');
+      grad.addColorStop(0.35, 'rgba(255,77,21,0.55)');
+      grad.addColorStop(1, 'rgba(255,77,21,0)');
+      gg.fillStyle = grad;
+      gg.fillRect(0, 0, 32, 32);
+    }
+
     // Mobile GPUs choke on full-screen canvas + shadowBlur: cut particles
     // and drop the per-ember glow there. Same choreography, lighter load.
     const mobile =
@@ -95,12 +110,15 @@ export function EmberCanvas({ active, onSettled }: EmberCanvasProps) {
 
         ctx.save();
         ctx.globalAlpha = Math.max(0, p.alpha);
-        ctx.fillStyle = p.color;
-        if (p.ember && !mobile) {
-          ctx.shadowColor = '#FF4D15';
-          ctx.shadowBlur = 10;
+        if (p.ember) {
+          const s = p.size * 7;
+          ctx.drawImage(glow, p.x - s / 2, p.y - s / 2, s, s);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size * 0.62);
+        } else {
+          ctx.fillStyle = p.color;
+          ctx.fillRect(p.x, p.y, p.size, p.size * 0.62);
         }
-        ctx.fillRect(p.x, p.y, p.size, p.size * 0.62);
         ctx.restore();
       }
 

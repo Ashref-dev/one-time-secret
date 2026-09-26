@@ -132,31 +132,22 @@
 
 .hud-fade { animation: hud-fade 0.35s cubic-bezier(0.22, 1, 0.36, 1) both; }
 
-/* ---------- burn scatter: letters fly off, box border goes first ---------- */
-@keyframes burn-scatter {
-  0%   { opacity: 1; transform: translate(0, 0) rotate(0deg); filter: blur(0); }
-  100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--rot)); filter: blur(3px); }
+/* ---------- mobile burn: single opacity fade, no per-letter layers ---------- */
+@keyframes burn-simple {
+  to { opacity: 0; }
 }
 
-.burn-char {
-  display: inline-block;
-  animation: burn-scatter 0.62s ease-in both;
-  will-change: transform, opacity;
-}
+.burn-simple { animation: burn-simple 0.5s ease-in both; }
 
-@keyframes burn-box {
-  to { border-color: transparent; background-color: transparent; }
-}
-
-.burn-box { animation: burn-box 0.35s ease-out both; }
+/* ---------- block fiery dissolve, synced to the ember hit ---------- */
 @keyframes burn-dissolve {
   0%   { opacity: 1; filter: blur(0) brightness(1); transform: translateY(0) scale(1); }
-  25%  { opacity: 1; filter: blur(1px) brightness(1.9); transform: translateY(-4px) scale(1.005); }
-  60%  { opacity: 0.55; filter: blur(4px) brightness(2.4); transform: translateY(-10px) scale(1.02); }
-  100% { opacity: 0; filter: blur(10px) brightness(3); transform: translateY(-22px) scale(1.04); }
+  15%  { opacity: 1; filter: blur(1px) brightness(2); transform: translateY(-5px) scale(1.006); }
+  55%  { opacity: 0.5; filter: blur(4px) brightness(2.5); transform: translateY(-12px) scale(1.02); }
+  100% { opacity: 0; filter: blur(10px) brightness(3); transform: translateY(-24px) scale(1.04); }
 }
 
-.burn-dissolve { animation: burn-dissolve 0.7s ease-in both; }
+.burn-dissolve { animation: burn-dissolve 0.6s cubic-bezier(0.22, 1, 0.36, 1) both; }
 @keyframes forge-in {
   from { opacity: 0; }
   to   { opacity: 1; }
